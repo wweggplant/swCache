@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html data-require-test-model="common">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="//cdn.bootcss.com/qunit/2.0.1/qunit.min.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script  src="//cdn.bootcss.com/qunit/2.0.1/qunit.min.js"></script>
+<script  data-local="jquery.test.js"></script>
+<script  src="../src/localStorage.js"></script>
+<script>
+QUnit.test('version', function(assert ) {
+    localStorage.clear();
+    localStorage.setItem("version","0.0.1");
+    localManager("0.0.1");
+    assert.equal(localStorage.getItem("version"), "0.0.1", "version 等于 0.0.1");
+});
+QUnit.test('存sript', function(assert ) {
+    localStorage.clear();
+    localManager("0.0.1");
+    assert.equal(localStorage.getItem("jquery.test"), true, "localStorage 有 jquery.test");
+});
+</script>
+</body>
+</html>
