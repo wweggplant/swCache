@@ -12,8 +12,13 @@
     var manager,//管理器
         resourceMap = {
             "script":"src",
-            "url":"href",
+            "link":"href",
             "img":"src"
+        },
+        createNodeMap = {
+            "script":"script",
+            "link":"style",
+            "img":"img"
         },
         storagePrefix = 'localStorage-';
     function isSupportLocalStorage() {
@@ -24,26 +29,29 @@
     }
     function getPlainTextByAjax(url){
         var xhr,queue=[];
-        xhr = new XMLHttpRequest();
-        xhr.open("get",url,true);
-        xhr.send();
+        if(url){
+            xhr = new XMLHttpRequest();
+            xhr.open("get",url,true);
+            xhr.send();
 
-        xhr.onreadystatechange = function(){
-            //回调队列
-            if (xhr.readyState==4 && xhr.status ==200&&queue.length>0) {
-                queue.forEach(function(cb){
-                    cb&&cb.call&&cb.call(this,xhr,xhr.reponseText);
-                });
-            }
-        };
-        return {
-            xhr:xhr,
-            done:function(cb){
-                 if (cb) {
-                    queue.push(cb);
+            xhr.onreadystatechange = function(){
+                //回调队列
+                if (xhr.readyState==4 && xhr.status ==200&&queue.length>0) {
+                    queue.forEach(function(cb){
+                        cb&&cb.call&&cb.call(this,xhr,xhr.responseText);
+                    });
                 }
-            }
-        };
+            };
+        }
+        return {
+                xhr:xhr,
+                done:function(cb){
+                     if (cb) {
+                        queue.push(cb);
+                    }
+                }
+            };
+
     }
     //判断类型
     Resource.prototype.getType = function(makup){
@@ -71,11 +79,10 @@
         };
     };
     Resource.prototype.init = function(makup){
-        var nameReg = /\/?([a-z\-\.]*).js/g;
         this.makup = makup;
         this.type = this.getType(makup);
-        this.url = makup.getAttribute("data-local");
-        this.name = (nameReg.exec(this.url))[1];
+        this.url = makup.getAttribute("data-local-url");
+        this.name = makup.getAttribute("data-local-name");
     };
     manager = function(version){
         var resources = {},
@@ -83,17 +90,17 @@
             local = localStorage,
             storage,
             storageInfoName = "storageInfo",
-            prefix = "data-local";
+            prefix = "data-local-name";
         storage = {
             isSupport:function() {
-                return true;
+                return localStorage&&localStorage.setItem;
             },
             get:function(name){
                 if(storage.isSupport()){
                     try{
-                        return JSON.parse(local.getItem(name));
+                        return JSON.parse(local.getItem(storagePrefix+name));
                     }catch(e){
-                        return local.getItem(name);
+                        return local.getItem(storagePrefix+name);
                     }
 
                 }
@@ -105,36 +112,38 @@
                 //https://github.com/addyosmani/basket.js/blob/gh-pages/dist/basket.js
                 if(storage.isSupport()){
                     try{
-                        local.removeItem(name);
-                        local.setItem(name,JSON.stringify(value));
+                        local.removeItem(storagePrefix+name);
+                        local.setItem(storagePrefix+name,JSON.stringify(value));
                     }catch(e){
                         //内存溢出
                         if ( e.name.toUpperCase().indexOf('QUOTA') >= 0 ) {
-                            var item;
-                            var tempScripts = [];
+                            //如果要存的东西比较大的话,这会造成死循环
+                            // var item;
+                            // var tempScripts = [];
 
-                            for ( item in local ) {
-                                if ( item.indexOf( storagePrefix ) === 0 ) {
-                                    tempScripts.push( JSON.parse( local[ item ] ) );
-                                }
-                            }
+                            // for ( item in local ) {
+                            //     if ( item.indexOf( storagePrefix ) === 0 ) {
+                            //         tempScripts.push( JSON.parse( local[ item ] ) );
+                            //     }
+                            // }
 
-                            if ( tempScripts.length ) {
-                                tempScripts.sort(function( a, b ) {
-                                    return a.stamp - b.stamp;
-                                });
+                            // if ( tempScripts.length ) {
+                            //     tempScripts.sort(function( a, b ) {
+                            //         return a.stamp - b.stamp;
+                            //     });
 
-                                storage.remove( tempScripts[ 0 ].key );
+                            //     storage.remove( tempScripts[ 0 ].key );
 
-                                return storage.set( name, value );
+                            //     return storage.set( name, value );
 
-                            } else {
-                                // no files to remove. Larger than available quota
-                                return;
-                            }
-
+                            // } else {
+                            //     // no files to remove. Larger than available quota
+                            //     return;
+                            // }
+                            console.error(e.stack);
                         } else {
                             // some other error
+                            console.error(e.stack);
                             return;
                         }
                     }
@@ -148,6 +157,12 @@
                 var xhr = getPlainTextByAjax(resource.url);
                 xhr.done(function(xhr,text){
                     var name = resource.name;
+                    //恢复node的请求
+                    if (markup.setAttribute) {
+                        markup.setAttribute(resourceMap[resource.type],resource.url)
+                    }else{
+                        markup[resourceMap[resource.type]] = resource.url
+                    }
                     //保存文本
                     storage.set(name,text);
                     //更新信息表
@@ -183,9 +198,15 @@
             //读取本地资源
             resources = loader.getAll();
             for(var resource  in resources){
-                var node = document.createNode(resource.type);
-                node.setAttribute(resourceMap[resource.type],resource.url);
-                document.appendChild(node);
+                if(!$$(resources[resource]["type"]+"[data-from-local='"+resource+"']").length){
+                    var type = resources[resource]["type"];
+                    var node = document.createElement(createNodeMap[type]);
+                    var storageText = storage.get(resource);
+                    node.innerHTML = storageText;
+                    node.setAttribute('data-from-local',resource);
+                    // node.setAttribute(resourceMap[resource.type],resource.url);
+                    document.body.appendChild(node);
+                }
             }
         }else{
             //请求本地资源并保存在local中
