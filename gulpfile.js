@@ -11,7 +11,7 @@ var src = "./src/";
   引入要使用的插件
 */
 var gulp = require('gulp');
-var cleanCSS = require('gulp-clean-css');
+var rename = require('gulp-rename');
 var del = require('del');
 var uglify = require('gulp-uglify');
 var del = require('del');
@@ -21,6 +21,7 @@ gulp.task('compressJs',function () {
             .pipe(gulp.dest(dist));
     gulp.src(src+"localStorage.js")
             .pipe(uglify())
+            .pipe(rename({suffix: '.min'}))
             .pipe(gulp.dest(dist));
 });
 //我们最后要运行的命令就是`gulp default`;

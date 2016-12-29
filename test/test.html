@@ -11,7 +11,7 @@
 <div id="qunit-fixture"></div>
 <script  src="//cdn.bootcss.com/qunit/2.0.1/qunit.min.js"></script>
 <script  src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
-<script  src="../src/localStorage.js"></script>
+<script  src="../dist/localStorage.min.js"></script>
 <script>
 
 function addLink(name,url){
@@ -33,7 +33,7 @@ function delay (secends,fn, ctx) {
         }
     }
 }
-QUnit.test('存sript', function(assert ) {
+QUnit.test('保存sript', function(assert ) {
     localStorage.clear();
     var script = addScript("jquery.test","js/jquery.test.js");
     var done = assert.async();
