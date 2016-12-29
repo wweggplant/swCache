@@ -1,1 +1,1 @@
-var local = "hallo world";
+var local  = "hallo world";
