@@ -17,9 +17,9 @@ var uglify = require('gulp-uglify');
 var del = require('del');
 //压缩js
 gulp.task('compressJs',function () {
-    gulp.src(src+"localStorage.js")
+    gulp.src(src+"jsCache.js")
             .pipe(gulp.dest(dist));
-    gulp.src(src+"localStorage.js")
+    gulp.src(src+"jsCache.js")
             .pipe(uglify())
             .pipe(rename({suffix: '.min'}))
             .pipe(gulp.dest(dist));

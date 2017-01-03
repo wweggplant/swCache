@@ -9,7 +9,7 @@
 ;(function(window,document){
     "use strict";
     //是否支持LocalStorage
-    var manager,//管理器
+    var jsCache,//管理器
         resourceMap = {
             "script":"src",
             "link":"href",
@@ -60,9 +60,6 @@
 
     //资源类
     function Resource(makup){
-        if(this===window){
-            return new Resource(makup);
-        }
         this.init(makup);
     }
 
@@ -84,7 +81,7 @@
         this.url = makup.getAttribute("data-local-url");
         this.name = makup.getAttribute("data-local-name");
     };
-    manager = function(version){
+    jsCache = function(version){
         var resources = {},
             loader,
             local = localStorage,
@@ -218,7 +215,7 @@
         }
         return loader;
     };
-    if(!window.localManager){
-        window.localManager = manager;
+    if(!window.jsCache){
+        window.jsCache = jsCache;
     }
 })(this,document);

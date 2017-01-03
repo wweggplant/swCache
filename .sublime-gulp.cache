@@ -1,1 +1,0 @@
-{"D:\\phpStudy\\WWW\\localSave\\gulpfile.js":{"sha1":"91f4048394bddb76cfbb42a79e5f7a8a768e58f7","tasks":{"compressJs":{"name":"compressJs","dependencies":""},"default":{"name":"default","dependencies":"compressJs"}}}}

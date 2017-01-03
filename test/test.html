@@ -11,7 +11,7 @@
 <div id="qunit-fixture"></div>
 <script  src="//cdn.bootcss.com/qunit/2.0.1/qunit.min.js"></script>
 <script  src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
-<script  src="../dist/localStorage.min.js"></script>
+<script  src="../src/jsCache.js"></script>
 <script>
 
 function addLink(name,url){
@@ -20,11 +20,15 @@ function addLink(name,url){
     return link;
 }
 function addScript(name,url){
-    var script = $("<script>",{"data-local-url":url,"data-local-name":name});
-    $("body").append(script);
-    return script;
+    var node = $("<script>",{"data-local-url":url,"data-local-name":name});
+    $("body").append(node);
+    return node;
 }
-
+function addImg(name,url){
+    var node = $("<img/>",{"data-local-url":url,"data-local-name":name});
+    $("body").append(node);
+    return node;
+}
 function delay (secends,fn, ctx) {
     if(typeof secends=="number"){
         return  function  (a) {
@@ -38,7 +42,7 @@ QUnit.test('保存sript', function(assert ) {
     var script = addScript("jquery.test","js/jquery.test.js");
     var done = assert.async();
     var done2 = assert.async();
-    localManager("0.0.1");
+    jsCache("0.0.1");
     var twoSecondFn  = delay(2,function(){
             assert.equal(JSON.parse(localStorage.getItem("localStorage-version")), "0.0.1", "version 等于 0.0.1");
             assert.equal(typeof localStorage.getItem("localStorage-jquery.test")==="string", true, "localStorage 有 jquery.test 是string类型");
@@ -46,9 +50,9 @@ QUnit.test('保存sript', function(assert ) {
             script.remove();
             done();
             script = addScript("jquery.test","js/jquery.test.js");
-            localManager("0.0.1");
+            jsCache("0.0.1");
             assert.equal(local, "hallo world", "从local中读取script标签内容并执行");
-            localManager("0.0.1");
+            jsCache("0.0.1");
             assert.equal($('script[data-from-local="jquery.test"]').length, 1, "不会重复添加jquery.test标签");
             done2();
             styleTest();
@@ -65,15 +69,15 @@ function styleTest () {
         var node = addLink("style","css/style.css");
         var done = assert.async();
         var done2 = assert.async();
-        localManager("0.0.1");
+        jsCache("0.0.1");
         $(function(){
             delay(2,function () {
-                 assert.equal(typeof localStorage.getItem("localStorage-style")==="string", true, "localStorage 有存放了style.css");
+                assert.equal(typeof localStorage.getItem("localStorage-style")==="string", true, "localStorage 有存放了style.css");
                 assert.equal(node.attr("href"), "css/style.css", "加载完成后修正href");
                 node.remove();
                 done();
                 node =  addLink("style","css/style.css");
-                localManager("0.0.1");
+                jsCache("0.0.1");
                 assert.equal($("body").css("background-color"), "rgba(0, 0, 0, 0)", "从local中读取style背景是rgb(255, 0, 0,0)");
                 done2();
                 fullTest();
@@ -92,11 +96,35 @@ function fullTest () {
         localStorage.clear();
         var node = addScript("flv","js/flv.js");
         var done = assert.async();
-        localManager("0.0.1");
+        jsCache("0.0.1");
         $(function(){
             delay(2,function () {
                 assert.equal(typeof localStorage.getItem("localStorage-flv")==="string", false, "localStorage 没有存放了flv");
                 done();
+                ImgTest();
+            })();
+        });
+    });
+}
+/*
+    图片测试
+ */
+function ImgTest () {
+    QUnit.test('图片测试', function(assert ) {
+        localStorage.clear();
+        var node = addImg("img","img/img.jpg");
+        var done = assert.async();
+        var done2 = assert.async();
+        jsCache("0.0.1");
+        $(function(){
+            delay(2,function () {
+                assert.equal(typeof localStorage.getItem("localStorage-img")==="string", true, "localStorage 有存放了img");
+                assert.equal(node.attr("src"), "img/img.jpg", "加载完成后修正href");
+                node.remove();
+                done();
+                jsCache("0.0.1");
+                assert.equal(!!$("[data-from-local=img]").attr("data-from-text"), true, "从local中读取img");
+                done2();
             })();
         });
     });

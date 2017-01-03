@@ -9,7 +9,7 @@
 ;(function(window,document){
     "use strict";
     //是否支持LocalStorage
-    var manager,//管理器
+    var jsCache,//管理器
         resourceMap = {
             "script":"src",
             "link":"href",
@@ -60,9 +60,6 @@
 
     //资源类
     function Resource(makup){
-        if(this===window){
-            return new Resource(makup);
-        }
         this.init(makup);
     }
 
@@ -84,7 +81,7 @@
         this.url = makup.getAttribute("data-local-url");
         this.name = makup.getAttribute("data-local-name");
     };
-    manager = function(version){
+    jsCache = function(version){
         var resources = {},
             loader,
             local = localStorage,
@@ -117,29 +114,6 @@
                     }catch(e){
                         //内存溢出
                         if ( e.name.toUpperCase().indexOf('QUOTA') >= 0 ) {
-                            //如果要存的东西比较大的话,这会造成死循环
-                            // var item;
-                            // var tempScripts = [];
-
-                            // for ( item in local ) {
-                            //     if ( item.indexOf( storagePrefix ) === 0 ) {
-                            //         tempScripts.push( JSON.parse( local[ item ] ) );
-                            //     }
-                            // }
-
-                            // if ( tempScripts.length ) {
-                            //     tempScripts.sort(function( a, b ) {
-                            //         return a.stamp - b.stamp;
-                            //     });
-
-                            //     storage.remove( tempScripts[ 0 ].key );
-
-                            //     return storage.set( name, value );
-
-                            // } else {
-                            //     // no files to remove. Larger than available quota
-                            //     return;
-                            // }
                             console.error(e.stack);
                         } else {
                             // some other error
@@ -202,7 +176,12 @@
                     var type = resources[resource]["type"];
                     var node = document.createElement(createNodeMap[type]);
                     var storageText = storage.get(resource);
-                    node.innerHTML = storageText;
+                    if (type!="img") {
+                        node.innerHTML = storageText;
+                    }else{
+                        node.setAttribute('data-from-text',storageText);
+                    }
+                    node.style.display = "none";
                     node.setAttribute('data-from-local',resource);
                     // node.setAttribute(resourceMap[resource.type],resource.url);
                     document.body.appendChild(node);
@@ -218,7 +197,7 @@
         }
         return loader;
     };
-    if(!window.localManager){
-        window.localManager = manager;
+    if(!window.jsCache){
+        window.jsCache = jsCache;
     }
 })(this,document);

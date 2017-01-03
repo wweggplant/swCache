@@ -1,2 +1,8 @@
-# localSave
-基于localStorage,保存js/css/html等资源
+# jsCache
+基于localStorage,保存js/css等资源
+
+# 使用
+
+
+
+
