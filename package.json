@@ -1,19 +1,33 @@
 {
-  "name": "localSave",
+  "name": "swcache",
   "version": "0.1.0",
-  "description": "基于localStorage,保存js/css/html等资源!",
+  "description": "基于service worker的资源缓存类库",
   "homepage": "",
   "repository": "",
   "author": "wweggplant",
   "license": "MIT",
-  "devDependencies": {
-    "del": "^2.2.2",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^2.0.12",
-    "gulp-filter": "^4.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.0",
-    "gulp-useref": "^3.1.0",
-    "vinyl-paths": "^2.1.0"
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "rollup -c",
+    "build": "npm run build:types && npm run build:js"
+  },
+  "main": "dist/rollup-plugin-babel.cjs.js",
+  "module": "dist/rollup-plugin-babel.esm.js",
+  "browser": "dist/rollup-plugin-babel.iife.js",
+  "types": "dist/types/index.d.ts",
+  "devDependencies": {},
+  "dependencies": {
+    "@babel/core": "7.10.2",
+    "@babel/plugin-proposal-class-properties": "7.10.1",
+    "@babel/plugin-proposal-object-rest-spread": "7.10.1",
+    "@babel/preset-env": "7.10.2",
+    "@babel/preset-typescript": "7.10.1",
+    "rollup": "2.12.1",
+    "@rollup/plugin-babel": "5.0.2",
+    "@rollup/plugin-commonjs": "12.0.0",
+    "@rollup/plugin-node-resolve": "8.0.0",
+    "typescript": "3.9.2"
   }
 }
