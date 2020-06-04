@@ -1,4 +1,4 @@
-# swCache
+# swCache(开发中...)
 
 基于`service worker`来存储资源。
 
