@@ -10,24 +10,28 @@
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "rollup -c",
-    "build": "npm run build:types && npm run build:js"
+    "build:js": "rollup -c scripts/rollup.config.js && rollup -c scripts/rollup.sw.config.js",
+    "build": "npm run  build:types && npm run build:js"
   },
-  "main": "dist/rollup-plugin-babel.cjs.js",
-  "module": "dist/rollup-plugin-babel.esm.js",
-  "browser": "dist/rollup-plugin-babel.iife.js",
+  "main": "dist/cache.cjs.js",
+  "module": "dist/cache.esm.js",
+  "browser": "dist/cache.iife.js",
   "types": "dist/types/index.d.ts",
   "devDependencies": {},
   "dependencies": {
     "@babel/core": "7.10.2",
     "@babel/plugin-proposal-class-properties": "7.10.1",
     "@babel/plugin-proposal-object-rest-spread": "7.10.1",
+    "@babel/plugin-transform-runtime": "^7.10.1",
     "@babel/preset-env": "7.10.2",
     "@babel/preset-typescript": "7.10.1",
-    "rollup": "2.12.1",
     "@rollup/plugin-babel": "5.0.2",
     "@rollup/plugin-commonjs": "12.0.0",
     "@rollup/plugin-node-resolve": "8.0.0",
+    "babel-polyfill": "^6.26.0",
+    "jest": "^26.0.1",
+    "rollup": "2.12.1",
+    "service-worker-mock": "^2.0.5",
     "typescript": "3.9.2"
   }
 }

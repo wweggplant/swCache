@@ -12,7 +12,12 @@
         "declaration": true,
         "target": "esnext",
         "module": "esnext",
-        "strict": true
+        "strict": true,
+        "lib": [
+            "es6",
+            "webworker",
+            "dom"
+        ]
     },
     "include": [
         "src/**/*"

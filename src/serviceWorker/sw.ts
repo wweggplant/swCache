@@ -1,24 +1,23 @@
 import { BaseCache } from "../Cache";
 import { isSupportCache } from '../util'
+declare var self: ServiceWorkerGlobalScope;
+
 export class ServiceCache extends BaseCache {
-    async add(name: string, value: any): Promise<BaseCache> {
-        const cache = await caches.open(this.cacheKey)
-        await cache.put(name, value)
-        return this;
+    add(name: string, value: any) {
+        return caches.open(this.cacheKey).then((cache: Cache) => cache.put(name, value).then(() => this))
     }
-    async addRequest(request: RequestInfo) {
-        const cache = await caches.open(this.cacheKey)
-        return cache.add(request);
+    addRequest(request: RequestInfo) {
+        return caches.open(this.cacheKey).then((cache: Cache) => cache.add(request).then(() => this))
     }
-    async remove(request: RequestInfo): Promise<BaseCache> {
-        const cache = await caches.open(this.cacheKey)
-        await cache.delete(request)
-        return this
+    remove(request: RequestInfo): Promise<BaseCache> {
+        return caches.open(this.cacheKey).then((cache: Cache) => 
+            cache.delete(request).then(() => this)
+        )
     }
-    async get(name: string): Promise<Response>  {
-        const cache = await caches.open(this.cacheKey)
-        const resp = await cache.match(name)
-        return resp ? resp : <Response><unknown>resp
+    get(name: string): Promise<Response | null>  {
+        return caches.open(this.cacheKey).then((cache: Cache) =>
+            cache.match(name).then(resp => resp ? resp : null)
+        )
     }
     cacheKey = 'swCacheKey'
     isSupportCache: boolean = true
@@ -45,6 +44,18 @@ export class ServiceCache extends BaseCache {
             } else if (data.type === 'get') {
                 this.get(data.name)
             }
+        });
+        self.addEventListener('activate', (event: any) => {
+            const currentCaches = [this.cacheKey];
+            event.waitUntil(
+                caches.keys().then(cacheNames => {
+                    return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
+                }).then(cachesToDelete => {
+                    return Promise.all(cachesToDelete.map(cacheToDelete => {
+                        return caches.delete(cacheToDelete);
+                    }));
+                }).then(() => self.clients.claim())
+            );
         });
         self.addEventListener('fetch', (event: any) =>  {
             event.respondWith(caches.match(event.request).then((response) => {
