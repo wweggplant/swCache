@@ -1,0 +1,42 @@
+Arguments: 
+  /Users/wangjojo/.nvm/versions/node/v12.16.0/bin/node /Users/wangjojo/.nvm/versions/node/v12.16.0/bin/yarn add global bower
+
+PATH: 
+  /Users/wangjojo/Documents/study/flutter/bin:/usr/local/sbin:/Users/wangjojo/.nvm/versions/node/v12.16.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/Apple/usr/bin:/Users/wangjojo/.nvm/versions/node/v12.16.0/bin:/opt/subversion/bin:/usr/local/sbin
+
+Yarn version: 
+  1.22.0
+
+Node version: 
+  12.16.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.npm.taobao.org/bower/download/bower-1.8.8.tgz: ETIMEDOUT
+      at Timeout._onTimeout (/Users/wangjojo/.nvm/versions/node/v12.16.0/lib/node_modules/yarn/lib/cli.js:141387:19)
+      at listOnTimeout (internal/timers.js:549:17)
+      at processTimers (internal/timers.js:492:7)
+
+npm manifest: 
+  {
+    "name": "sw-test-bed",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "express": "^4.13.3"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

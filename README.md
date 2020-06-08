@@ -10,5 +10,6 @@
   ！！！注意:
   1. `service worker`需要开启`https`
   2. `service worker`不能操作DOM对象
+  3. `service worker`拦截的请求必须是异步的, 比如`fetch`方法请求
 
 
