@@ -20,8 +20,10 @@
 var fs = require('fs');
 var path = require('path');
 var express = require('express');
+var pkg = require('../../package.json');
 var app = express();
 
+const distName = `${pkg.name}.${pkg .version}`
 // This is a template for a service worker with a place holder to add
 // a files array
 var serviceWorkerTemplate = fs.readFileSync('./sw-tmpl.js').toString();
@@ -32,9 +34,7 @@ app.use('/', express.static('./front-end/'));
 app.use('/tests/', express.static('./tests/'));
 
 /**
- * This is a helper endpoint to return a generated service worker
- * The structure is each section is treated as a flag to enable
- * a feature like caching or a file revision
+  后端生成service worker返回的内容
  */
 app.get('/sw/:fileCache/:fileRev/:cacheId/:numOfAssets*', function(req, res) {
   var fileCacheString = 'no-cache';
@@ -55,8 +55,8 @@ app.get('/sw/:fileCache/:fileRev/:cacheId/:numOfAssets*', function(req, res) {
   var filtered = serviceWorkerTemplate.replace('/**@@SW_ASSETLIST@@**/',
     JSON.stringify(fileList));
 
-  filtered = filtered.replace('/**@@SW_CACHED_ID@@**/',
-    req.params.cacheId);
+  filtered = filtered.replace('/**@@SW_CACHED_ID@@**/',req.params.cacheId);
+  filtered = filtered.replace('/**@@SW_CONTENT@@**/', fs.readFileSync(`./front-end/build/${distName}.js`).toString());
 
   res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('Service-Worker-Allowed', '/');

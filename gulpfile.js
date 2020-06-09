@@ -1,28 +1,48 @@
-/*
-  前面的步骤都是定义一些路径的变量
+const gulp = require('gulp');
+const rollup = require('rollup');
+const del = require('del')
+const rollupTypescript = require('rollup-plugin-typescript');
+const pkg = require('./package.json');
+var fs = require( 'fs' )
 
-*/
+const devEnv = ['development','production'];
+const distName = `${pkg.name}.${pkg.version}`
+const cleanDistDir = mode => () => {
+  return devEnv.includes(mode) ? del(['./dist']): undefined
+}
+const cleanUnitDir = () => {
+  return del(['./tests/unit/front-end/build/*'])
+}
+const rollupBuild = (entry,outDir,moduleName)  => {
+  return  rollup.rollup({
+    input: entry,
+    plugins: [
+      rollupTypescript()
+    ]
+  }).then( bundle => {
+    return bundle.write({
+      file: outDir,
+      format:'iife',
+      name: moduleName,
+      sourcemap: true
+    })
+  }).then(file =>{
+    fs.copyFile(`./dist/${distName}.js`,`tests/unit/front-end/build/${distName}.js`,function(err){
+      if(err) console.log('something wrong was happened')
+      else console.log('copy file succeed');
+    })
+  })
+}
 
-//dist是生成版本的目标文件夹,就是最终要部署到线上的文件夹
-var dist = "./dist/";
-//src目录是我们的源代码
-var src = "./src/";
-/*
-  引入要使用的插件
-*/
-var gulp = require('gulp');
-var rename = require('gulp-rename');
-var del = require('del');
-var uglify = require('gulp-uglify');
-var del = require('del');
-//压缩js
-gulp.task('compressJs',function () {
-    gulp.src(src+"jsCache.js")
-            .pipe(gulp.dest(dist));
-    gulp.src(src+"jsCache.js")
-            .pipe(uglify())
-            .pipe(rename({suffix: '.min'}))
-            .pipe(gulp.dest(dist));
-});
-//我们最后要运行的命令就是`gulp default`;
-gulp.task('default', ['compressJs']);
+const buildTs = done => {
+  //这里配置多页面js配置打包就可以了，传入值改为数组拼接url可以实现多入口插件js打包
+  rollupBuild('./src/index.ts', `./dist/cache.${pkg.version}.js`, 'Cache')
+  rollupBuild('./src/serviceWorker/sw.ts', `./dist/${distName}.js`, `${pkg.name}`)
+  done()
+}
+
+function unitTest()  {
+
+}
+
+gulp.task('default',gulp.series(cleanDistDir('development'), cleanUnitDir, buildTs))

@@ -10,7 +10,7 @@ export class ServiceCache extends BaseCache {
         return caches.open(this.cacheKey).then((cache: Cache) => cache.add(request).then(() => this))
     }
     remove(request: RequestInfo): Promise<BaseCache> {
-        return caches.open(this.cacheKey).then((cache: Cache) => 
+        return caches.open(this.cacheKey).then((cache: Cache) =>
             cache.delete(request).then(() => this)
         )
     }
